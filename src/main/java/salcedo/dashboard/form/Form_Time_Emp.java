@@ -45,7 +45,7 @@ public class Form_Time_Emp extends javax.swing.JPanel {
         
         ResultSet rs = query.getRow(conn, "userIn, userOut, userAftIn, userAftOut", "UserTable", "userID =" + userID);
         ResultSet rs2 = query.getRow(conn, "timeIn", "TimeTable", "userID =" + userID);
-        ResultSet rs3 = query.getRow(conn, "timeHistIn as 'Time In', timeHistOut as 'Time Out', timeHistDiff as 'Total Time In Minutes', timeHistOT as 'Overtime', timeHistUT as 'Undertime', timeHistType as 'AM/PM'", "TimeHistoryTable", "userID =" + userid);
+        ResultSet rs3 = query.getRow(conn, "timeHistIn as 'Time In', timeHistOut as 'Time Out', timeHistDiff as 'Total Time In Minutes', timeHistOT as 'Overtime', timeHistUT as 'Undertime', timeHistType as 'AM/PM'", "TimeHistoryTable", "userID =" + userid + " ORDER by timeHistID DESC");
         try{
             if(rs.next()){
                 timeInLabel.setText("Time In: " + rs.getString("userIn") + "/" + rs.getString("userAftIn"));

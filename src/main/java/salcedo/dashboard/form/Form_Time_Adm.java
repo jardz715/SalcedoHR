@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
@@ -11,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,19 +23,23 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import main.DBQueries;
+import main.ExcelDTR;
 import net.proteanit.sql.DbUtils;
 
 public class Form_Time_Adm extends javax.swing.JPanel {
 
     Connection conn;
     int userid;
-   
+    int tempID;
     
     public Form_Time_Adm(Connection temp, int ID) throws SQLException{
         conn = temp;
         userid = ID;
         initComponents();
         jTable.addTableStyle(jScrollPane2);
+        printButton1.setVisible(false);
+        yearChooser1.setVisible(false);
+        dateBox1.setVisible(false);
     }
     
     private void initTable(ResultSet rs) {
@@ -96,6 +102,9 @@ public class Form_Time_Adm extends javax.swing.JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable = new salcedo.dashboard.swing.Table();
         downloadButton = new javax.swing.JButton();
+        printButton1 = new javax.swing.JToggleButton();
+        dateBox1 = new javax.swing.JComboBox<>();
+        yearChooser1 = new com.toedter.calendar.JYearChooser();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
@@ -170,24 +179,40 @@ public class Form_Time_Adm extends javax.swing.JPanel {
             }
         });
 
+        printButton1.setBackground(new java.awt.Color(153, 153, 153));
+        printButton1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        printButton1.setText("Print");
+        printButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                printButton1ActionPerformed(evt);
+            }
+        });
+
+        dateBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" }));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 921, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGroup(layout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 921, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(attendanceLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(130, 130, 130)
-                        .addComponent(downloadButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(searchLabel)
-                        .addGap(18, 18, 18)
-                        .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(searchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addComponent(attendanceLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(130, 130, 130)
+                .addComponent(downloadButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(searchLabel)
+                .addGap(18, 18, 18)
+                .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(searchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(printButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(dateBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(yearChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -199,8 +224,14 @@ public class Form_Time_Adm extends javax.swing.JPanel {
                     .addComponent(searchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(downloadButton, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 444, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 327, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(yearChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(dateBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(printButton1)))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -211,11 +242,18 @@ public class Form_Time_Adm extends javax.swing.JPanel {
         try{
             if(rs.next() != false){
                 String userID = rs.getString("userID");
-                ResultSet rs2 = query.getRow(conn, "timeHistIn as 'Time In', timeHistOut as 'Time Out', timeHistDiff as 'Total Time In Minutes', timeHistOT as 'Overtime', timeHistUT as 'Undertime', timeHistType as 'AM/PM'", "TimeHistoryTable", "userID =" + userID);
+                tempID = rs.getInt("userID");
+                printButton1.setVisible(true);
+                yearChooser1.setVisible(true);
+                dateBox1.setVisible(true);
+                ResultSet rs2 = query.getRow(conn, "timeHistIn as 'Time In', timeHistOut as 'Time Out', timeHistDiff as 'Total Time In Minutes', timeHistOT as 'Overtime', timeHistUT as 'Undertime', timeHistType as 'AM/PM'", "TimeHistoryTable", "userID =" + userID + " ORDER by timeHistID DESC");
                 initTable(rs2);
                 centerTableComponents();
             }else{
                 JOptionPane.showMessageDialog(null, "Username cannot be found in the Database.", "Error", JOptionPane.INFORMATION_MESSAGE);
+                printButton1.setVisible(false);
+                yearChooser1.setVisible(false);
+                dateBox1.setVisible(false);
             }
         }catch (SQLException ex) {
             Logger.getLogger(Form_Profile_Emp.class.getName()).log(Level.SEVERE, null, ex);
@@ -239,14 +277,26 @@ public class Form_Time_Adm extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_downloadButtonActionPerformed
 
+    private void printButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButton1ActionPerformed
+        ExcelDTR dtr = new ExcelDTR();
+        try {
+            dtr.ExcelDTR(conn, tempID, Integer.toString(dateBox1.getSelectedIndex()+1), dateBox1.getSelectedItem().toString(), yearChooser1.getYear());
+        } catch (IOException | SQLException | ParseException ex) {
+            Logger.getLogger(Form_Time_Emp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_printButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel attendanceLabel;
+    private javax.swing.JComboBox<String> dateBox1;
     private javax.swing.JButton downloadButton;
     private javax.swing.JScrollPane jScrollPane2;
     private salcedo.dashboard.swing.Table jTable;
+    private javax.swing.JToggleButton printButton1;
     private javax.swing.JToggleButton searchButton;
     private javax.swing.JTextField searchField;
     private javax.swing.JLabel searchLabel;
+    private com.toedter.calendar.JYearChooser yearChooser1;
     // End of variables declaration//GEN-END:variables
 }

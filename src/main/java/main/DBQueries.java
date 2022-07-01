@@ -111,7 +111,7 @@ public class DBQueries {
                  
                  ResultSet rs = selectFromTable(conn, "*", "UserTable");
                  if(rs.next() == false){
-                    sql = "INSERT INTO UserTable VALUES (0,'admin123', 'admin123@aer.ph', 'admin', 'admin', 'admin', 69, '091234567891', null,'admin123', 1, null, null, null, null, null, null, null, null, null)";
+                    sql = "INSERT INTO UserTable VALUES (0,'admin123', 'admin123@aer.ph', 'admin', 'admin', 'admin', 69, '091234567891', null,'admin123', 1, '08:00:00', '12:00:00', '13:00:00', '17:00:00', null, null, null, null, null)";
                     stmt.executeUpdate(sql);     
                  }
                  
