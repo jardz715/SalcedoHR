@@ -11,8 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.xssf.usermodel.*;
@@ -30,8 +28,8 @@ public class ExcelDTR {
         if(Date.length() == 1){
             Date = "0" + Date;
         }
-        userData = query.getRow(conn, "*", "UserTable", "userID = " + ID );
-        timeData = query.getRow(conn, "timeHistType, timeHistUT, strftime('%d', timeHistin) as timeDay, strftime('%H:%M:%S', timeHistIn) as timeHistIn, strftime('%H:%M:%S', timeHistOut) as timeHistOut", "TimeHistoryTable", "strftime('%m-%Y', timeHistIn) = '" + Date +  "-" + Year + "' AND userID = " + ID);
+        userData = query.getRow(conn, "*", "UserTable", "userid = " + ID );
+        timeData = query.getRow(conn, "timeHistType, timeHistUT, DATE_FORMAT(timeHistin, '%d') as timeDay, DATE_FORMAT(timeHistIn, '%H:%i:%S') as timeHistIn, DATE_FORMAT(timeHistOut, '%H:%i:%S') as timeHistOut", "TimeHistoryTable", "DATE_FORMAT(timeHistIn, '%m-%Y') = '" + Date +  "-" + Year + "' AND userID = " + ID);
         
         //Resets file back to start everytime
         File file = new File("resources\\documents\\DTR_" + ID + ".xlsx");
@@ -44,7 +42,9 @@ public class ExcelDTR {
         //Full Name
         XSSFRow row = sheet.getRow(3);
         XSSFCell cell = row.getCell(0);
-        cell.setCellValue(userData.getString("userLastN") + ", " + userData.getString("userFirstN") + " " + userData.getString("userMiddleN"));
+        if(userData.next() != false){
+            cell.setCellValue(userData.getString("userlastn") + ", " + userData.getString("userfirstn") + " " + userData.getString("usermiddlen"));
+        }
         
         //Year and Month
         row = sheet.getRow(6);
@@ -54,10 +54,10 @@ public class ExcelDTR {
         //Arrival and Departure
         row = sheet.getRow(7);
         cell = row.getCell(0);
-        cell.setCellValue("Office Hours    Arrival A.M. " + userData.getString("userIn") + "          P.M. " + userData.getString("userAftIn"));
+        cell.setCellValue("Office Hours    Arrival A.M. " + userData.getString("userin") + "          P.M. " + userData.getString("userAftIn"));
         row = sheet.getRow(8);
         cell = row.getCell(0);
-        cell.setCellValue("               Departure A.M." + userData.getString("userOut") + "          P.M." + userData.getString("userAftOut"));
+        cell.setCellValue("               Departure A.M." + userData.getString("userout") + "          P.M." + userData.getString("userAftOut"));
         
         //Time record
         

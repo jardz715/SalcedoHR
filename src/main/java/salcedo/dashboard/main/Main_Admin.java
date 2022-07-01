@@ -4,11 +4,13 @@ import salcedo.dashboard.event.EventMenuSelected;
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import main.DBQueries;
 import main.Main;
 import salcedo.dashboard.form.Form_Doc_Adm;
 import salcedo.dashboard.form.Form_Employees_Admin;
@@ -105,7 +107,7 @@ public class Main_Admin extends javax.swing.JFrame {
     }
     
     private void delVisible(int uID){
-        if(uID != 0){
+        if(uID != 1){
             delButton.setVisible(true);
         }
         else{
@@ -216,7 +218,7 @@ public class Main_Admin extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void delButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delButtonActionPerformed
-        // TODO add your handling code here:
+        // TODO add your handling code here
         int response = JOptionPane.showConfirmDialog(rootPane,
                     "Are you sure you want to permanently delete this admin account?",
                     "EXIT",

@@ -70,7 +70,7 @@ public class Form_Profile_Emp extends javax.swing.JPanel {
                 genderField.setText(rs.getString("userGender"));
                 emailField.setText(rs.getString("userEmail"));
                 addField.setText(rs.getString("userAdd"));
-                numField.setText("0" + rs.getString("userContact"));
+                numField.setText(rs.getString("userContact"));
                 appDateField.setText(rs.getString("userAppDate"));
                 statusField.setText(rs.getString("userStatus"));
                 natField.setText(rs.getString("userNat"));

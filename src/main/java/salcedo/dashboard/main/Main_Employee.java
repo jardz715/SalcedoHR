@@ -95,7 +95,7 @@ public class Main_Employee extends javax.swing.JFrame {
     
     private void checkifTimeOutForgot() throws SQLException{
         DBQueries query = new DBQueries();
-        ResultSet rs = query.getRow(conn, "*", "TimeTable", "DATE(timeIn) = DATE(NOW() - INTERVAL 1 DAY) AND userID = " + userid);
+        ResultSet rs = query.getRow(conn, "*", "TimeTable", "DATE(timeIn) < DATE(LOCALTIMESTAMP - 1) AND userID = " + userid);
         if(rs.next() != false){
             TimeInTimeOut t = new TimeInTimeOut();   
             t.forceTimeOut(conn, userid);
@@ -243,7 +243,7 @@ public class Main_Employee extends javax.swing.JFrame {
     //Modified
     private void timeInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeInActionPerformed
         DBQueries query = new DBQueries();
-        ResultSet rs = query.getRow(conn, "*", "TimeHistoryTable", "DATE('timeHistIn') = CURTIME() AND userID = " + userid + " AND timeHistType = 'Morning' ORDER BY timeHistID DESC");
+        ResultSet rs = query.getRow(conn, "*", "TimeHistoryTable", "DATE(timeHistIn) >= DATE(LOCALTIMESTAMP) AND userID = " + userid + " AND timeHistType = 'Morning' ORDER BY timeHistID DESC");
         try {
             if(!query.isTimeWithinDay(conn, userid)){
                 if(rs.next() == false){

@@ -81,6 +81,7 @@ public class Form_Doc_Adm extends javax.swing.JPanel {
                                 File file1 = new File(rs3.getString("docPath"));
                                 file1.delete();
                             }
+                            rs2.next();
                             File file = new File(rs2.getString("dTemplatePath"));
                             file.delete(); 
                         } catch (SQLException ex) {
@@ -277,7 +278,7 @@ public class Form_Doc_Adm extends javax.swing.JPanel {
                     for(int j = 1; j <= model1.getColumnCount(); j++){
                         if(j == 1){
                         }else{
-                            if(model1.getValueAt(i-1,j-1).equals(0)){
+                            if(model1.getValueAt(i-1,j-1).equals(false)){
                                 model1.setValueAt("No", i-1, j-1);
                             }else{
                                 model1.setValueAt("Yes", i-1, j-1);
@@ -316,15 +317,19 @@ public class Form_Doc_Adm extends javax.swing.JPanel {
                     int response2 = JOptionPane.showConfirmDialog(null, "Are you sure you want to reset " + jTable1.getValueAt(row, column) + "?." , "RESET", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                     if(response2 == 0 ){
                         try {
-                        ResultSet rs2 = query.getRow(conn, "DocTemplateTable.dTemplatePath, DocumentTable.docPath",
-                                "DocTemplateTable INNER JOIN DocumentTable ON DocTemplateTable.dTemplateID = DocumentTable.dtemplateid",
-                                "DocumentTable.docID = " + rs.getString("docID"));
-                        FileUtils.copyFile(new File(rs2.getString("dTemplatePath")), new File(rs2.getString("docPath")));
-                        query.updateRow(conn, "DocumentTable", "docSubmitted = 0", "docID = " + rs.getString("docID"));
-                        query.updateRow(conn, "DocumentTable", "docValidated = 0", "docID = " + rs.getString("docID"));
-                        JOptionPane.showMessageDialog(null, "Document Successfully Reset.", "Confirm", JOptionPane.INFORMATION_MESSAGE);
-                        } catch (SQLException | IOException ex) {
-                            Logger.getLogger(Form_Doc_Emp.class.getName()).log(Level.SEVERE, null, ex);
+                            rs.next();
+                            ResultSet rs2 = query.getRow(conn, "DocTemplateTable.dTemplatePath, DocumentTable.docPath",
+                                    "DocTemplateTable INNER JOIN DocumentTable ON DocTemplateTable.dTemplateID = DocumentTable.dtemplateid",
+                                    "DocumentTable.docID = " + rs.getString("docID"));
+                            rs2.next();
+                            FileUtils.copyFile(new File(rs2.getString("dTemplatePath")), new File(rs2.getString("docPath")));
+                            query.updateRow(conn, "DocumentTable", "docSubmitted = 0", "docID = " + rs.getString("docID"));
+                            query.updateRow(conn, "DocumentTable", "docValidated = 0", "docID = " + rs.getString("docID"));
+                            JOptionPane.showMessageDialog(null, "Document Successfully Reset.", "Confirm", JOptionPane.INFORMATION_MESSAGE);
+                            jTable1.setValueAt("No", row, 1);
+                            jTable1.setValueAt("No", row, 2);
+                            } catch (SQLException | IOException ex) {
+                                Logger.getLogger(Form_Doc_Emp.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 }else if (response == 2){
@@ -332,6 +337,7 @@ public class Form_Doc_Adm extends javax.swing.JPanel {
                     if(response2 == 0){
                         ResultSet rs3 = query.getRow(conn, "docPath", "DocumentTable", "docTitle = '" + jTable1.getValueAt(row, column) + "'");
                         try {
+                            rs3.next();
                             File file = new File(rs3.getString("docPath"));
                             file.delete(); 
                         } catch (SQLException ex) {
@@ -343,9 +349,10 @@ public class Form_Doc_Adm extends javax.swing.JPanel {
                     }
                 }else if (response == 3){
                     try {
+                        rs.next();
                         if(rs.getBoolean("docSubmitted") && !rs.getBoolean("docValidated")){
                             query.updateRow(conn, "DocumentTable", "docValidated = 1", "docID = " + rs.getString("docID"));
-                            jTable1.setValueAt(1, row, 2);
+                            jTable1.setValueAt("Yes", row, 2);
                             JOptionPane.showMessageDialog(null, "Document Successfully Validated.", "Warning", JOptionPane.INFORMATION_MESSAGE);
                         }else
                             JOptionPane.showMessageDialog(null, "Document is either already validated, or not submitted.", "Warning", JOptionPane.INFORMATION_MESSAGE);

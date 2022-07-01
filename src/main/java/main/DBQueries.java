@@ -36,9 +36,11 @@ public class DBQueries {
 	// prior to be changed, just a quick attempt
 	protected void createTables(Connection conn) {
 		try {
-			Statement stmt = conn.createStatement();
+                        Statement stmt = conn.createStatement();
+                        String sql = "USE MxLQn5fRYE";
+                        stmt.executeUpdate(sql);
 			
-			String sql = "CREATE TABLE IF NOT EXISTS UserTable " +
+			sql = "CREATE TABLE IF NOT EXISTS UserTable " +
                            "(userid int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
                            " username varchar(255) DEFAULT NULL, " +
                            " useremail varchar(255) DEFAULT NULL, " +
@@ -46,7 +48,7 @@ public class DBQueries {
                            " userlastn varchar(255) DEFAULT NULL, " +
                            " usermiddlen varchar(255) DEFAULT NULL, " +
                            " userage int(11) DEFAULT NULL, " +
-                           " usercontact int(11) DEFAULT NULL, " +
+                           " usercontact varchar(20) DEFAULT NULL, " +
                            " usergender varchar(20) DEFAULT NULL, " +
                            " userpass varchar(255) DEFAULT NULL, " +
                            " userisadmin tinyint(1) DEFAULT NULL, " +
@@ -107,8 +109,12 @@ public class DBQueries {
                            " docvalidated tinyint(1) DEFAULT NULL); ";
 	         stmt.executeUpdate(sql);
                  
-                 sql = "INSERT INTO UserTable VALUES (0,'admin123', 'admin123@aer.ph', 'admin', 'admin', 'admin', 69, 091234567891, null,'admin123', 1, null, null, null, null, null, null, null, null, null)";
-                 stmt.executeUpdate(sql);     
+                 ResultSet rs = selectFromTable(conn, "*", "UserTable");
+                 if(rs.next() == false){
+                    sql = "INSERT INTO UserTable VALUES (0,'admin123', 'admin123@aer.ph', 'admin', 'admin', 'admin', 69, '091234567891', null,'admin123', 1, null, null, null, null, null, null, null, null, null)";
+                    stmt.executeUpdate(sql);     
+                 }
+                 
 	         
 	      } catch (SQLException e) {
 	         e.printStackTrace();
@@ -234,7 +240,7 @@ public class DBQueries {
         
         //Modified
         public boolean isTimeWithinDay(Connection conn, int id) throws ParseException{
-            ResultSet rs = getRow(conn, "*", "TimeHistoryTable", "DATE('timeHistIn') = CURTIME() AND userID = " + id + " ORDER BY timeHistID DESC");
+            ResultSet rs = getRow(conn, "*", "TimeHistoryTable", "DATE(timeHistIn) >= DATE(LOCALTIMESTAMP) AND userID = " + id + " ORDER BY timeHistID DESC");
             try{
                 if(rs.next() != false){
                     if(rs.getString("timeHistType").equals("Morning")){
@@ -358,7 +364,7 @@ public class DBQueries {
 	//calculates minutes
 	protected int getTimeDiff(Connection conn, int ID) {
             try {
-                String sql = "SELECT ROUND(TIMESTAMPDIFF(MINUTE, timeIn, timeOut)) AS difference FROM TimeTable WHERE userID = " + ID;
+                String sql = "SELECT TIMESTAMPDIFF(MINUTE, timeIn, timeOut) AS difference FROM TimeTable WHERE userID = " + ID;
                     Statement stmt = conn.createStatement();
                     ResultSet rs = stmt.executeQuery(sql);
                     rs.next();
@@ -373,10 +379,10 @@ public class DBQueries {
 	protected int getOT(Connection conn, int ID) {
             String sql;
             int compare;
-            ResultSet rs = getRow(conn, "timeType, ROUND(TIMESTAMPDIFF(MINUTE, userIn, userOut)) as userDiff, ROUND(TIMESTAMPDIFF(MINUTE, userAftIn, userAftOut)) as userAftDiff", "TimeTable", "userID = " + ID);
+            ResultSet rs = getRow(conn, "timeType, TIMESTAMPDIFF(MINUTE, TIME(userIn), TIME(userOut)) as userDiff, TIMESTAMPDIFF(MINUTE, TIME(userAftIn), TIME(userAftOut)) as userAftDiff", "TimeTable", "userID = " + ID);
             try {
 //                sql = "SELECT ROUND((JULIANDAY(strftime('%H:%M:%S' ,timeOut)) - JULIANDAY(strftime('%H:%M:%S' ,timeIn))) * 24 * 60) AS overtime FROM TimeTable WHERE userID = " + ID;
-                sql = "SELECT ROUND(TIMESTAMPDIFF(MINUTE, DATE_FORMAT(TIME(userOut), '%H:%M:%S'), DATE_FORMAT(timeOut, '%H:%M:%S'))) AS overtime FROM TimeTable WHERE userID = " + ID;
+                sql = "SELECT TIMESTAMPDIFF(MINUTE, timeIn, timeOut) AS overtime FROM TimeTable WHERE userID = " + ID;
                 if(rs.next() == false || rs.getString("timeType").equals("Morning")){
                     compare = rs.getInt("userDiff");
                 }else{
@@ -403,18 +409,20 @@ public class DBQueries {
         protected int getUT(Connection conn, int ID) {
             String sql;
             int compare;
-            ResultSet rs = getRow(conn, "timeType, ROUND(TIMESTAMPDIFF(MINUTE, userIn, userOut)) as userDiff, ROUND(TIMESTAMPDIFF(MINUTE, userAftIn, userAftOut)) as userAftDiff", "TimeTable", "userID = " + ID);
+            ResultSet rs = getRow(conn, "timeType, TIMESTAMPDIFF(MINUTE, TIME(userIn), TIME(userOut)) as userDiff, TIMESTAMPDIFF(MINUTE, TIME(userAftIn), TIME(userAftOut)) as userAftDiff", "TimeTable", "userID = " + ID);
             try {
 //                sql = "SELECT ROUND((JULIANDAY(strftime('%H:%M:%S' ,timeOut)) - JULIANDAY(strftime('%H:%M:%S' ,timeIn))) * 24 * 60) AS undertime FROM TimeTable WHERE userID = " + ID;
-                sql = "SELECT ROUND(TIMESTAMPDIFF(MINUTE, DATE_FORMAT(TIME(userOut), '%H:%M:%S'), DATE_FORMAT(timeOut, '%H:%M:%S'))) AS undertime FROM TimeTable WHERE userID = " + ID;
+                sql = "SELECT TIMESTAMPDIFF(MINUTE, timeIn, timeOut) AS undertime FROM TimeTable WHERE userID = " + ID;
                 if(rs.next() == false || rs.getString("timeType").equals("Morning")){
                     compare = rs.getInt("userDiff");
+                    System.out.println(rs.getString("userDiff"));
                 }else{
                     compare = rs.getInt("userAftDiff");
                 }
                 Statement stmt = conn.createStatement();
                 ResultSet rs2 = stmt.executeQuery(sql);
                 rs2.next();
+                System.out.println(rs2.getString("undertime"));
                 if(compare > rs2.getInt("undertime")){
                     int temp = compare - rs2.getInt("undertime");
                     if(temp > 0) {

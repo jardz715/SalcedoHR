@@ -55,7 +55,7 @@ public class Form_Doc_Emp extends javax.swing.JPanel {
                 for(int j = 1; j <= model1.getColumnCount(); j++){
                     if(j == 1){
                     }else{
-                        if(model1.getValueAt(i-1,j-1).equals(0)){
+                        if(model1.getValueAt(i-1,j-1).equals(false)){
                             model1.setValueAt("No", i-1, j-1);
                         }else{
                             model1.setValueAt("Yes", i-1, j-1);
@@ -100,7 +100,10 @@ public class Form_Doc_Emp extends javax.swing.JPanel {
                         if(isNotExisting){
                             // we add a document for ourselves
                             ResultSet rs = query.getRow(conn, "dTemplateID, dTemplatePath, dTemplateTitle", "DocTemplateTable", "dTemplateTitle = '" + jTable.getValueAt(row, column) + "'");
-                            File pathFile = new File(rs.getString("dTemplatePath"));
+                            File pathFile = null;
+                            if(rs.next() != false){
+                                pathFile = new File(rs.getString("dTemplatePath"));
+                            }
                             String extension = FilenameUtils.getExtension(rs.getString("dTemplatePath"));
                             File copyFile = new File("resources/documents/" + rs.getString("dTemplateTitle") + "_" + userid + "." + extension);
                             List<String> list = new ArrayList<String>();
@@ -152,6 +155,7 @@ public class Form_Doc_Emp extends javax.swing.JPanel {
                    }
                 }else if(response == 1){
                     try {
+                        rs.next();
                         if(rs.getBoolean("docSubmitted")){
                             int response3 = JOptionPane.showConfirmDialog(null, "Resetting file will remove file's submissions. Do you wish to continue?." , "RESET", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                             if(response3 == 0){
@@ -172,6 +176,7 @@ public class Form_Doc_Emp extends javax.swing.JPanel {
                     
                 }else if(response == 2){
                     try {
+                        rs.next();
                         if(!rs.getBoolean("docSubmitted"))
                             query.updateRow(conn, "DocumentTable", "docSubmitted = 1", "docID = " + rs.getString("docID"));
                         else
@@ -187,12 +192,15 @@ public class Form_Doc_Emp extends javax.swing.JPanel {
     }
     
     protected void launchReset(ResultSet rs){
-
+        
         try {
         ResultSet rs2 = query.getRow(conn, "DocTemplateTable.dTemplatePath, DocumentTable.docPath",
                 "DocTemplateTable INNER JOIN DocumentTable ON DocTemplateTable.dTemplateID = DocumentTable.dtemplateid",
                 "DocumentTable.docID = " + rs.getString("docID"));
-        FileUtils.copyFile(new File(rs2.getString("dTemplatePath")), new File(rs2.getString("docPath")));
+        rs2.next();
+        File file = new File(rs2.getString("docPath"));
+        file.setWritable(true);
+        FileUtils.copyFile(new File(rs2.getString("dTemplatePath")), file);
         JOptionPane.showMessageDialog(null, "Document Successfully Reset.", "Confirm", JOptionPane.INFORMATION_MESSAGE);
         } catch (SQLException | IOException ex) {
             Logger.getLogger(Form_Doc_Emp.class.getName()).log(Level.SEVERE, null, ex);
