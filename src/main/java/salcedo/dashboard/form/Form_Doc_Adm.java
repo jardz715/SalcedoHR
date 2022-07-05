@@ -22,6 +22,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import main.DBQueries;
+import main.ToBase64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -61,10 +62,14 @@ public class Form_Doc_Adm extends javax.swing.JPanel {
                 int column = 0;
                 String[] options = new String[] {"Open", "Delete", "Close"};
                 int response = JOptionPane.showOptionDialog(null, "File: " + jTable.getValueAt(row, column), "Document", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[2]);
-                ResultSet rs2 = query.getRow(conn, "dTemplatePath", "DocTemplateTable", "dTemplateTitle = '" + jTable.getValueAt(row, column) + "'");
+                ResultSet rs2 = query.getRow(conn, "dTemplatePath, dTemplateBase", "DocTemplateTable", "dTemplateTitle = '" + jTable.getValueAt(row, column) + "'");
+                //base64 need
+                ToBase64 base = new ToBase64();
+                
                 if(response == 0){
                    try {
                        if(rs2.next() != false){
+                           base.decodeFile(rs.getBytes("dTemplateBase"), rs.getString("dTemplatePath"));
                            File file = new File(rs2.getString("dTemplatePath"));
                            file.setWritable(true);
                            Desktop.getDesktop().open(file);
@@ -79,11 +84,15 @@ public class Form_Doc_Adm extends javax.swing.JPanel {
                         try {
                             while(rs3.next() != false){
                                 File file1 = new File(rs3.getString("docPath"));
-                                file1.delete();
+                                if(file1.exists()){
+                                    file1.delete();
+                                }
                             }
                             rs2.next();
                             File file = new File(rs2.getString("dTemplatePath"));
-                            file.delete(); 
+                            if(file.exists()){
+                                file.delete(); 
+                            }
                         } catch (SQLException ex) {
                             Logger.getLogger(Form_Doc_Adm.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -248,11 +257,16 @@ public class Form_Doc_Adm extends javax.swing.JPanel {
             try {
                 list.add(copyFile.getPath());
                 list.add(FilenameUtils.removeExtension(filename));
+                
+                //base64 here need
+                ToBase64 base = new ToBase64();
+                String encoded = base.encodeFile(addFile.getSelectedFile().getAbsolutePath());
                 if(query.isStrUnique(conn, list.get(1), "dTemplateTitle", "DocTemplateTable")){
                     FileUtils.copyFile(pathFile, copyFile);
-                    query.insertDocTemplate(conn, list);
+                    query.insertDocTemplate(conn, list, encoded);
                 }else{
                     FileUtils.copyFile(pathFile, copyFile);
+                    query.updateRow(conn, "DocTemplateTable", "dTemplateBase = '" + encoded + "'", "dTemplateTitle = '" + list.get(1) + "'");
                     JOptionPane.showMessageDialog(null, "File already added to the system, File Updated.", "Error", JOptionPane.INFORMATION_MESSAGE);
                     }
             }catch (IOException e) {
@@ -301,11 +315,15 @@ public class Form_Doc_Adm extends javax.swing.JPanel {
                 int row = target.getSelectedRow(); // select a row
                 int column = 0;
                 String[] options = new String[] {"Open", "Reset", "Delete", "Validate", "Close"};
-                ResultSet rs = query.getRow(conn, "docID, docPath, docSubmitted, docValidated", "DocumentTable", "docTitle = '" + jTable1.getValueAt(row, column) + "'");
+                ResultSet rs = query.getRow(conn, "docID, docPath, docSubmitted, docValidated, docBase", "DocumentTable", "docTitle = '" + jTable1.getValueAt(row, column) + "'");
                 int response = JOptionPane.showOptionDialog(null, "File: " + jTable.getValueAt(row, column), "Document", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[4]);
+                
+                //base64 here need
+                ToBase64 base = new ToBase64();
                 if(response == 0){
                    try {
                        if(rs.next() != false){
+                           base.decodeFile(rs.getBytes("docBase"), rs.getString("docPath"));
                            File file = new File(rs.getString("docPath"));
                            file.setWritable(true);
                            Desktop.getDesktop().open(file);
@@ -318,6 +336,7 @@ public class Form_Doc_Adm extends javax.swing.JPanel {
                     if(response2 == 0 ){
                         try {
                             rs.next();
+                            base.decodeFile(rs.getBytes("docBase"), rs.getString("docPath"));
                             ResultSet rs2 = query.getRow(conn, "DocTemplateTable.dTemplatePath, DocumentTable.docPath",
                                     "DocTemplateTable INNER JOIN DocumentTable ON DocTemplateTable.dTemplateID = DocumentTable.dtemplateid",
                                     "DocumentTable.docID = " + rs.getString("docID"));
@@ -339,7 +358,8 @@ public class Form_Doc_Adm extends javax.swing.JPanel {
                         try {
                             rs3.next();
                             File file = new File(rs3.getString("docPath"));
-                            file.delete(); 
+                            if(file.exists())
+                                file.delete(); 
                         } catch (SQLException ex) {
                             Logger.getLogger(Form_Doc_Adm.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -350,6 +370,7 @@ public class Form_Doc_Adm extends javax.swing.JPanel {
                 }else if (response == 3){
                     try {
                         rs.next();
+                        base.decodeFile(rs.getBytes("docBase"), rs.getString("docPath"));
                         if(rs.getBoolean("docSubmitted") && !rs.getBoolean("docValidated")){
                             query.updateRow(conn, "DocumentTable", "docValidated = 1", "docID = " + rs.getString("docID"));
                             jTable1.setValueAt("Yes", row, 2);
@@ -358,6 +379,8 @@ public class Form_Doc_Adm extends javax.swing.JPanel {
                             JOptionPane.showMessageDialog(null, "Document is either already validated, or not submitted.", "Warning", JOptionPane.INFORMATION_MESSAGE);
                     } catch (SQLException ex) {
                         Logger.getLogger(Form_Doc_Emp.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(Form_Doc_Adm.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             getDataFromDB(conn);

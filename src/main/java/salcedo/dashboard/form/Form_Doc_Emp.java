@@ -5,6 +5,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -19,6 +20,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import main.DBQueries;
+import main.ToBase64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -76,10 +78,15 @@ public class Form_Doc_Emp extends javax.swing.JPanel {
                 int column = 0;
                 String[] options = new String[] {"Open", "Duplicate Copy", "Close"};
                 int response = JOptionPane.showOptionDialog(null, "File: " + jTable.getValueAt(row, column), "Document", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[2]);
-                ResultSet rs2 = query.getRow(conn, "dTemplatePath", "DocTemplateTable", "dTemplateTitle = '" + jTable.getValueAt(row, column) + "'");
+                ResultSet rs2 = query.getRow(conn, "dTemplatePath, dTemplatebase", "DocTemplateTable", "dTemplateTitle = '" + jTable.getValueAt(row, column) + "'");
+                
+                //base64 need
+                ToBase64 base = new ToBase64();
+                
                 if(response == 0){
                     try {
                        if(rs2.next() != false){
+                           base.decodeFile(rs2.getBytes("dTemplatebase"), rs2.getString("dTemplatePath"));
                            File file = new File(rs2.getString("dTemplatePath"));
                            file.setWritable(false);
                            Desktop.getDesktop().open(file);
@@ -98,6 +105,11 @@ public class Form_Doc_Emp extends javax.swing.JPanel {
                         }
                         
                         if(isNotExisting){
+                            // base 64
+                            if(rs2.next() != false){
+                                base.decodeFile(rs2.getBytes("dTemplatebase"), rs2.getString("dTemplatePath"));
+                            }
+                            
                             // we add a document for ourselves
                             ResultSet rs = query.getRow(conn, "dTemplateID, dTemplatePath, dTemplateTitle", "DocTemplateTable", "dTemplateTitle = '" + jTable.getValueAt(row, column) + "'");
                             File pathFile = null;
@@ -105,7 +117,8 @@ public class Form_Doc_Emp extends javax.swing.JPanel {
                                 pathFile = new File(rs.getString("dTemplatePath"));
                             }
                             String extension = FilenameUtils.getExtension(rs.getString("dTemplatePath"));
-                            File copyFile = new File("resources/documents/" + rs.getString("dTemplateTitle") + "_" + userid + "." + extension);
+                            String copyFilePath = "resources/documents/" + rs.getString("dTemplateTitle") + "_" + userid + "." + extension;
+                            File copyFile = new File(copyFilePath);
                             List<String> list = new ArrayList<String>();
                             list.add(Integer.toString(userid));
                             list.add(rs.getString("dTemplateID"));
@@ -113,8 +126,11 @@ public class Form_Doc_Emp extends javax.swing.JPanel {
                             list.add(FilenameUtils.removeExtension(copyFile.getName()));
                             list.add(Integer.toString(0));
                             list.add(Integer.toString(0));
-                            query.insertDocument(conn, list);
                             FileUtils.copyFile(pathFile, copyFile);
+                            String encoded = base.encodeFile(copyFilePath);
+                            list.add(encoded);
+                            query.insertDocument(conn, list);
+                            
                             
                         }else{
                             JOptionPane.showMessageDialog(null, "You already have a duplicate of this file.", "Error", JOptionPane.INFORMATION_MESSAGE);
@@ -138,10 +154,15 @@ public class Form_Doc_Emp extends javax.swing.JPanel {
                 int column = 0;
                 String[] options = new String[] {"Open", "Reset", "Submit", "Close"};
                 int response = JOptionPane.showOptionDialog(null, "File: " + jTable1.getValueAt(row, column), "Document", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[3]);
-                ResultSet rs = query.getRow(conn, "docID, docPath, docSubmitted", "DocumentTable", "docTitle = '" + jTable1.getValueAt(row, column) + "'");
+                ResultSet rs = query.getRow(conn, "docID, docPath, docSubmitted, docBase", "DocumentTable", "docTitle = '" + jTable1.getValueAt(row, column) + "'");
+                
+                //base64 need
+                ToBase64 base = new ToBase64();
+                
                 if(response == 0){
                    try {
                        if(rs.next() != false){
+                           base.decodeFile(rs.getBytes("docBase"), rs.getString("docPath"));
                            File file = new File(rs.getString("docPath"));
                            if(rs.getBoolean("docSubmitted")){
                                file.setWritable(false);
@@ -162,26 +183,37 @@ public class Form_Doc_Emp extends javax.swing.JPanel {
                                 query.updateRow(conn, "DocumentTable", "docSubmitted = 0", "docID = " + rs.getString("docID"));
                                 query.updateRow(conn, "DocumentTable", "docValidated = 0", "docID = " + rs.getString("docID"));
                                 int response2 = JOptionPane.showConfirmDialog(null, "Are you sure you want to reset " + jTable1.getValueAt(row, column) + " as default?." , "RESET", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                                if(response2 == 0 )
+                                if(response2 == 0 ){
+                                    base.decodeFile(rs.getBytes("docBase"), rs.getString("docPath"));
                                     launchReset(rs);
+                                }
                             }
                         }else{
                             int response2 = JOptionPane.showConfirmDialog(null, "Are you sure you want to reset " + jTable1.getValueAt(row, column) + " as default?." , "RESET", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                                 if(response2 == 0 )
+                                    base.decodeFile(rs.getBytes("docBase"), rs.getString("docPath"));
                                     launchReset(rs);
                         }
-                    } catch (SQLException ex) {
+                    } catch (SQLException | IOException ex) {
                         Logger.getLogger(Form_Doc_Emp.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     
                 }else if(response == 2){
                     try {
                         rs.next();
-                        if(!rs.getBoolean("docSubmitted"))
-                            query.updateRow(conn, "DocumentTable", "docSubmitted = 1", "docID = " + rs.getString("docID"));
-                        else
-                            JOptionPane.showMessageDialog(null, "You already have submitted this document.", "Warning", JOptionPane.INFORMATION_MESSAGE);
-                    } catch (SQLException ex) {
+                        File file = new File(rs.getString("docPath"));
+                        if(file.exists()){
+                            if(!rs.getBoolean("docSubmitted")){
+                                String newBase = base.encodeFile(rs.getString("docPath"));
+                                query.updateRow(conn, "DocumentTable", "docSubmitted = 1, docBase = '" + newBase + "'", "docID = " + rs.getString("docID"));
+                            }else
+                                JOptionPane.showMessageDialog(null, "You already have submitted this document.", "Warning", JOptionPane.INFORMATION_MESSAGE);
+                        }else{
+                            JOptionPane.showMessageDialog(null, "File is not currently on your local storage. Please open the file first to make your own copy.", "Warning", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                        
+                        
+                    } catch (SQLException | IOException ex) {
                         Logger.getLogger(Form_Doc_Emp.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
@@ -194,10 +226,12 @@ public class Form_Doc_Emp extends javax.swing.JPanel {
     protected void launchReset(ResultSet rs){
         
         try {
-        ResultSet rs2 = query.getRow(conn, "DocTemplateTable.dTemplatePath, DocumentTable.docPath",
+        ResultSet rs2 = query.getRow(conn, "DocTemplateTable.dTemplatePath, DocumentTable.docPath, DocTemplateTable.dTemplateBase",
                 "DocTemplateTable INNER JOIN DocumentTable ON DocTemplateTable.dTemplateID = DocumentTable.dtemplateid",
                 "DocumentTable.docID = " + rs.getString("docID"));
         rs2.next();
+        String newBase64 = rs2.getString("dTemplateBase");
+        query.updateRow(conn, "DocumentTable", "docBase = '" + newBase64 +"'", "docID = " + rs.getString("docID"));
         File file = new File(rs2.getString("docPath"));
         file.setWritable(true);
         FileUtils.copyFile(new File(rs2.getString("dTemplatePath")), file);

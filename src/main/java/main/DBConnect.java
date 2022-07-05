@@ -12,7 +12,7 @@ public class DBConnect {
 		// Initialize DB path
                 String userN = "MxLQn5fRYE";
                 String userP = "ZcheZ4k5Gy";
-
+                
                 try {
                     Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
                     Connection conn = DriverManager.getConnection("jdbc:mysql://remotemysql.com:3306/", userN, userP);

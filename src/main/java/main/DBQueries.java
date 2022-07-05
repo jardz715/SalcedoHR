@@ -96,7 +96,8 @@ public class DBQueries {
                  sql = "CREATE TABLE IF NOT EXISTS DocTemplateTable " +
 	                   "(dtemplateid int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
 	                   " dtemplatepath longtext DEFAULT NULL, " +
-	                   " dtemplatetitle longtext DEFAULT NULL); "; 
+                           " dtemplatetitle longtext DEFAULT NULL, " +
+	                   " dtemplatebase longtext DEFAULT NULL); "; 
 	         stmt.executeUpdate(sql);
                  
                  sql = "CREATE TABLE IF NOT EXISTS DocumentTable " +
@@ -106,7 +107,9 @@ public class DBQueries {
 	                   " docpath longtext DEFAULT NULL, " +
 	                   " doctitle longtext DEFAULT NULL, " +
                            " docsubmitted tinyint(1) DEFAULT NULL, " +
-                           " docvalidated tinyint(1) DEFAULT NULL); ";
+                           " docvalidated tinyint(1) DEFAULT NULL, " +
+                           " docbase longtext DEFAULT NULL); ";
+                           
 	         stmt.executeUpdate(sql);
                  
                  ResultSet rs = selectFromTable(conn, "*", "UserTable");
@@ -277,13 +280,14 @@ public class DBQueries {
             }
 	}
         
-        public void insertDocTemplate(Connection conn, List<String> list) {
-            String sql = "INSERT INTO DocTemplateTable (dTemplatePath, dTemplateTitle) VALUES (?,?)";
+        public void insertDocTemplate(Connection conn, List<String> list, String base) {
+            String sql = "INSERT INTO DocTemplateTable (dTemplatePath, dTemplateTitle, dTemplateBase) VALUES (?,?,?)";
             try {
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 for (int i = 0; i < list.size(); i++) {
                     pstmt.setString(i+1, list.get(i));
                 }
+                pstmt.setString(3, base);
                 pstmt.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -291,7 +295,7 @@ public class DBQueries {
 	}
         
         public void insertDocument(Connection conn, List<String> list) {
-            String sql = "INSERT INTO DocumentTable (userID, dTemplateID ,docPath, docTitle, docValidated, docSubmitted) VALUES (?,?,?,?,?,?)";
+            String sql = "INSERT INTO DocumentTable (userID, dTemplateID ,docPath, docTitle, docValidated, docSubmitted, docBase) VALUES (?,?,?,?,?,?,?)";
             try {
 		PreparedStatement pstmt = conn.prepareStatement(sql);
                 for (int i = 0; i < list.size(); i++) {
