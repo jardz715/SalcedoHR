@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import main.DBConnect;
 import main.DBQueries;
 import main.Main;
 import main.TimeInTimeOut;
@@ -57,8 +58,23 @@ public class Main_Employee extends javax.swing.JFrame {
                         Logger.getLogger(Main_Employee.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     jLabel1.setText("Dashboard");
-                }
-                else if (index == 12){
+                }else if (index == 11){
+                    int response = JOptionPane.showConfirmDialog(rootPane,
+                    "Reset Database Connection?",
+                    "RESET",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+                    if(response == 0)
+                    {
+                        DBConnect dbc = new DBConnect();
+                        try {
+                            conn = dbc.dbCheck();
+                            JOptionPane.showMessageDialog(null, "Connection Refreshed.", "REFRESH", JOptionPane.INFORMATION_MESSAGE);
+                        } catch (SQLException ex) {
+                            Logger.getLogger(Main_Employee.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }else if (index == 12){
                     int response = JOptionPane.showConfirmDialog(rootPane,
                     "Are you sure you want to log out?",
                     "EXIT",
@@ -179,9 +195,9 @@ public class Main_Employee extends javax.swing.JFrame {
                         .addGap(26, 26, 26)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(timeIn, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(timeIn, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(timeOut, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(timeOut, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(21, 21, 21))
                     .addGroup(panelBorder1Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -203,7 +219,7 @@ public class Main_Employee extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
-            .addComponent(menu_Employee, javax.swing.GroupLayout.PREFERRED_SIZE, 627, Short.MAX_VALUE)
+            .addComponent(menu_Employee, javax.swing.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

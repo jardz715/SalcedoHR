@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import main.DBConnect;
 import main.DBQueries;
 import main.Main;
 import salcedo.dashboard.form.Form_Doc_Adm;
@@ -72,6 +73,23 @@ public class Main_Admin extends javax.swing.JFrame {
                         delButton.setVisible(false);
                     } catch (SQLException ex) {
                         Logger.getLogger(Main_Employee.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                else if (index == 11){
+                    int response = JOptionPane.showConfirmDialog(rootPane,
+                    "Reset Database Connection?",
+                    "RESET",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+                    if(response == 0)
+                    {
+                        DBConnect dbc = new DBConnect();
+                        try {
+                            conn = dbc.dbCheck();
+                            JOptionPane.showMessageDialog(null, "Connection Refreshed.", "REFRESH", JOptionPane.INFORMATION_MESSAGE);
+                        } catch (SQLException ex) {
+                            Logger.getLogger(Main_Employee.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 }
                 else if (index == 12){
