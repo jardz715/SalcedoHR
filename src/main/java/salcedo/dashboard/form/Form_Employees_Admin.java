@@ -297,8 +297,8 @@ public class Form_Employees_Admin extends javax.swing.JPanel {
                     JTextField field2 = new JTextField(pass);
                     JTextField field3 = new JTextField(email);
                     JTextField field4 = new JTextField(fName);
-                    JTextField field5 = new JTextField(lName);
-                    JTextField field6 = new JTextField(mName);
+                    JTextField field5 = new JTextField(mName);
+                    JTextField field6 = new JTextField(lName);
                     JTextField field7 = new JTextField(pos);
                     JTextField field8 = new JTextField(timeIn);
                     JTextField field9 = new JTextField(timeOut);
@@ -342,7 +342,7 @@ public class Form_Employees_Admin extends javax.swing.JPanel {
                     if (result == JOptionPane.OK_OPTION) {
                         // Gets input from the edit fields
                 String  user2 = field1.getText().toLowerCase(), pass2 = field2.getText(), email2 = field3.getText(), 
-                        fName2 = field4.getText(), lName2 = field5.getText(), mName2 = field6.getText(),
+                        fName2 = field4.getText(), mName2 = field5.getText(), lName2 = field6.getText(),
                         pos2 = field7.getText(), timeIn2 = field8.getText(), timeOut2 = field9.getText(),
                         timeAftIn2 = field10.getText(), timeAftOut2 = field11.getText();
                 DateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
@@ -354,7 +354,7 @@ public class Form_Employees_Admin extends javax.swing.JPanel {
                     }
                 } else appDate2 = dateFormat.format(appDateChooser.getDate()); // else use newly set date as current date
                 
-                        if(user2.equals("") && pass2.equals("") && email2.equals("") && fName2.equals("") && lName2.equals("") && mName2.equals("") && pos2.equals("") && appDateChooser.getDate() == null && timeOut2.equals("") && timeIn2.equals("") && timeAftOut2.equals("") && timeAftIn2.equals("")) {
+                        if(user2.equals("") && pass2.equals("") && email2.equals("") && fName2.equals("") && mName2.equals("") && lName2.equals("") && pos2.equals("") && appDateChooser.getDate() == null && timeOut2.equals("") && timeIn2.equals("") && timeAftOut2.equals("") && timeAftIn2.equals("")) {
                             JOptionPane.showMessageDialog(null, "No input provided!", "Error", JOptionPane.INFORMATION_MESSAGE);
                         } else {
                             if(user2.equals("")) {
@@ -365,12 +365,12 @@ public class Form_Employees_Admin extends javax.swing.JPanel {
                                         JOptionPane.QUESTION_MESSAGE);
                                         if(response == 0)
                                         {
-                                            String stmt = String.format("username = '%s', userPass = '%s', userEmail = '%s', userFirstN = '%s', userLastN = '%s', userMiddleN = '%s', userPos = '%s', userAppDate = '%s', userIn = '%s', userOut = '%s', userAftIn = '%s', userAftOut = '%s'", user2, pass2, email2, fName2, lName2, mName2, pos2, appDate2, timeIn2, timeOut2, timeAftIn2, timeAftOut2);
+                                            String stmt = String.format("username = '%s', userPass = '%s', userEmail = '%s', userFirstN = '%s', userMiddleN = '%s', userLastN = '%s', userPos = '%s', userAppDate = '%s', userIn = '%s', userOut = '%s', userAftIn = '%s', userAftOut = '%s'", user2, pass2, email2, fName2, mName2, lName2, pos2, appDate2, timeIn2, timeOut2, timeAftIn2, timeAftOut2);
                                             String stmt2 = "userID = '" + userField.getText() + "'";
                                             query.updateEmp(conn, TABLE_NAME, stmt, stmt2);
                                             userField.setText("");
                                             deleteField.setText("");
-                                            user = ""; pass = ""; email = ""; fName = ""; lName = ""; mName = ""; pos = ""; timeIn = ""; timeOut = ""; timeAftIn = ""; timeAftOut = ""; 
+                                            user = ""; pass = ""; email = ""; fName = ""; mName = ""; lName = ""; pos = ""; timeIn = ""; timeOut = ""; timeAftIn = ""; timeAftOut = ""; 
                                             initTable();
                                             centerTableComponents();
                                             loop = false;
@@ -385,12 +385,12 @@ public class Form_Employees_Admin extends javax.swing.JPanel {
                                             JOptionPane.OK_CANCEL_OPTION,
                                             JOptionPane.QUESTION_MESSAGE);
                                             if(response == 0) {
-                                                String stmt = String.format("username = '%s', userPass = '%s', userEmail = '%s', userFirstN = '%s', userLastN = '%s', userMiddleN = '%s', userPos = '%s', userAppDate = '%s', userIn = '%s', userOut = '%s', userAftIn = '%s', userAftOut = '%s'", user2, pass2, email2, fName2, lName2, mName2, pos2, appDate2, timeIn2, timeOut2, timeAftIn2, timeAftOut2);
+                                                String stmt = String.format("username = '%s', userPass = '%s', userEmail = '%s', userFirstN = '%s', userMiddleN = '%s', userLastN = '%s', userPos = '%s', userAppDate = '%s', userIn = '%s', userOut = '%s', userAftIn = '%s', userAftOut = '%s'", user2, pass2, email2, fName2, mName2, lName2, pos2, appDate2, timeIn2, timeOut2, timeAftIn2, timeAftOut2);
                                                 String stmt2 = "userID = '" + userField.getText() + "'";
                                                 query.updateEmp(conn, TABLE_NAME, stmt, stmt2);
                                                 userField.setText("");
                                                 deleteField.setText("");
-                                                user = ""; pass = ""; email = ""; fName = ""; lName = ""; mName = ""; pos = ""; appDate = null; timeIn = ""; timeOut = ""; timeAftIn = ""; timeAftOut = ""; 
+                                                user = ""; pass = ""; email = ""; fName = ""; mName = ""; lName = ""; pos = ""; appDate = null; timeIn = ""; timeOut = ""; timeAftIn = ""; timeAftOut = ""; 
                                                 initTable();
                                                 centerTableComponents();
                                                 loop = false;
@@ -410,7 +410,7 @@ public class Form_Employees_Admin extends javax.swing.JPanel {
                             }
                         }
                     } else {
-                        user = ""; pass = ""; email = ""; fName = ""; lName = ""; mName = ""; pos = ""; appDate = null; timeIn = ""; timeOut = ""; timeAftIn = ""; timeAftOut = ""; 
+                        user = ""; pass = ""; email = ""; fName = ""; mName = ""; lName = ""; pos = ""; appDate = null; timeIn = ""; timeOut = ""; timeAftIn = ""; timeAftOut = ""; 
                         loop = false;
                     }
                 }while(loop);
