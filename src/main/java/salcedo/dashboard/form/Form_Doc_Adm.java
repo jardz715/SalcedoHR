@@ -69,7 +69,7 @@ public class Form_Doc_Adm extends javax.swing.JPanel {
                 if(response == 0){
                    try {
                        if(rs2.next() != false){
-                           base.decodeFile(rs.getBytes("dTemplateBase"), rs.getString("dTemplatePath"));
+                           base.decodeFile(rs2.getBytes("dTemplateBase"), rs2.getString("dTemplatePath"));
                            File file = new File(rs2.getString("dTemplatePath"));
                            file.setWritable(true);
                            Desktop.getDesktop().open(file);
