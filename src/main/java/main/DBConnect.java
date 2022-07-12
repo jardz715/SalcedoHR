@@ -10,7 +10,7 @@ public class DBConnect {
             
 		// Initialize DB path
                 String userN = "freedb_salcedo";
-                String userP = "#CxE5c&3j$kgH%h";
+                String userP = "hTsYf#fQumRXR6d";
                 
                 try {
                     Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
