@@ -162,14 +162,17 @@ public class Form_Doc_Emp extends javax.swing.JPanel {
                 if(response == 0){
                    try {
                        if(rs.next() != false){
-                           base.decodeFile(rs.getBytes("docBase"), rs.getString("docPath"));
                            File file = new File(rs.getString("docPath"));
-                           if(rs.getBoolean("docSubmitted")){
-                               file.setWritable(false);
-                           }else{
-                               file.setWritable(true);
-                           }
-                           Desktop.getDesktop().open(file);
+                           if(!file.exists()){
+                               base.decodeFile(rs.getBytes("docBase"), rs.getString("docPath"));
+                           }  
+                            if(rs.getBoolean("docSubmitted")){
+                                file.setWritable(false);
+                            }else{
+                                file.setWritable(true);
+                            }
+                            Desktop.getDesktop().open(file);
+                           
                        }
                    } catch (SQLException | IOException ex) {
                        Logger.getLogger(Form_Doc_Adm.class.getName()).log(Level.SEVERE, null, ex);

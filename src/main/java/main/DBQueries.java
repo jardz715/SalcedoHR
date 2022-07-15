@@ -37,7 +37,7 @@ public class DBQueries {
 	protected void createTables(Connection conn) {
 		try {
                         Statement stmt = conn.createStatement();
-                        String sql = "USE freedb_SalcedoHRAdmin";
+                        String sql = "USE salcedohr";
                         stmt.executeUpdate(sql);
 			
 			sql = "CREATE TABLE IF NOT EXISTS UserTable " +

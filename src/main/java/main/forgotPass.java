@@ -15,8 +15,6 @@ public class forgotPass extends javax.swing.JFrame {
     
     public forgotPass() throws SQLException {
         initComponents();
-        // get original password field character
-        passChar = passField.getEchoChar();
     }
 
     int xMouse = 0, yMouse = 0;
@@ -75,11 +73,11 @@ public class forgotPass extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         userField = new javax.swing.JTextField();
-        passField = new javax.swing.JPasswordField();
         retypeField = new javax.swing.JPasswordField();
         registLabel = new javax.swing.JLabel();
         backLabel = new javax.swing.JLabel();
         newPassField3 = new javax.swing.JPasswordField();
+        userField1 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -169,7 +167,7 @@ public class forgotPass extends javax.swing.JFrame {
 
         jLabel4.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(7, 164, 121));
-        jLabel4.setText("Current Password:");
+        jLabel4.setText("Email:");
 
         jLabel5.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(7, 164, 121));
@@ -181,9 +179,6 @@ public class forgotPass extends javax.swing.JFrame {
 
         userField.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         userField.setForeground(new java.awt.Color(75, 175, 152));
-
-        passField.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-        passField.setForeground(new java.awt.Color(75, 175, 152));
 
         retypeField.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         retypeField.setForeground(new java.awt.Color(75, 175, 152));
@@ -217,6 +212,14 @@ public class forgotPass extends javax.swing.JFrame {
             }
         });
 
+        userField1.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        userField1.setForeground(new java.awt.Color(75, 175, 152));
+        userField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                userField1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -232,8 +235,8 @@ public class forgotPass extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(userField, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(passField, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(newPassField3, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(newPassField3, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(userField1, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(117, 117, 117))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel6)
@@ -256,7 +259,7 @@ public class forgotPass extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(passField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(userField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(19, 19, 19)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
@@ -342,14 +345,14 @@ public class forgotPass extends javax.swing.JFrame {
     private void registLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_registLabelMouseClicked
         DBQueries query = new DBQueries();
         String uname = userField.getText();
-        String curPass = String.valueOf(passField.getPassword());
+        String curPass = userField1.getText();
         String newPass = String.valueOf(newPassField3.getPassword());
         String retypePass = String.valueOf(retypeField.getPassword());
         if(!isFieldEmpty(uname, curPass, newPass, retypePass)){
             ResultSet userSet = query.getRow(conn, "*", "UserTable", "username = '" + uname.toLowerCase() + "'");
             try {
                 if(userSet.next() != false){
-                    if(curPass.equals(userSet.getString("userPass"))){
+                    if(curPass.equals(userSet.getString("useremail"))){
                         if(!notIdentical(newPass, retypePass)){
                             String stmt = String.format("userPass = '%s'", newPass);
                             String stmt2 = "username = '" + uname.toLowerCase() + "'";
@@ -376,6 +379,10 @@ public class forgotPass extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_newPassField3ActionPerformed
 
+    private void userField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_userField1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -393,9 +400,9 @@ public class forgotPass extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPasswordField newPassField3;
-    private javax.swing.JPasswordField passField;
     private javax.swing.JLabel registLabel;
     private javax.swing.JPasswordField retypeField;
     private javax.swing.JTextField userField;
+    private javax.swing.JTextField userField1;
     // End of variables declaration//GEN-END:variables
 }

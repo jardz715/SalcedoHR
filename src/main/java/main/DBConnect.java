@@ -9,12 +9,13 @@ public class DBConnect {
 	public Connection dbCheck() throws SQLException{
             
 		// Initialize DB path
-                String userN = "freedb_salcedo";
-                String userP = "hTsYf#fQumRXR6d";
+                String server = "jdbc:mysql://db4free.net:3306";
+                String userN = "salcedohr";
+                String userP = "salcedo004";
                 
                 try {
                     Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-                    Connection conn = DriverManager.getConnection("jdbc:mysql://sql.freedb.tech:3306/", userN, userP);
+                    Connection conn = DriverManager.getConnection(server, userN, userP);
 
                     //Add methods for creating all tables here. Preferably a different class for recycling purposes
                     DBQueries query = new DBQueries();
