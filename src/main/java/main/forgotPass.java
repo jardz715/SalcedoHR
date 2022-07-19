@@ -358,6 +358,16 @@ public class forgotPass extends javax.swing.JFrame {
                             String stmt2 = "username = '" + uname.toLowerCase() + "'";
                             query.updateRow(conn, "UserTable", stmt, stmt2);
                             JOptionPane.showMessageDialog(null, "Password Updated.", "Notice", JOptionPane.INFORMATION_MESSAGE);
+                            
+                            Main m;
+                            try {
+                                this.dispose();
+                                m = new Main();
+                                m.setVisible(true);
+                                m.setLocationRelativeTo(null);
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
                         }else{
                             JOptionPane.showMessageDialog(null, "Retype Password is not the same as New Password.", "Error", JOptionPane.INFORMATION_MESSAGE);
                         }
