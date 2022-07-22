@@ -156,7 +156,7 @@ public class forgotPass extends javax.swing.JFrame {
                         .addComponent(admTitleLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(admSubLabel)))
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
@@ -175,7 +175,7 @@ public class forgotPass extends javax.swing.JFrame {
 
         jLabel6.setFont(new java.awt.Font("Century Gothic", 1, 18)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(7, 164, 121));
-        jLabel6.setText("Re-type Password");
+        jLabel6.setText("Re-type Password:");
 
         userField.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         userField.setForeground(new java.awt.Color(75, 175, 152));
@@ -244,7 +244,7 @@ public class forgotPass extends javax.swing.JFrame {
                         .addComponent(retypeField, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(registLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(registLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(backLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(103, 103, 103))))
@@ -358,6 +358,16 @@ public class forgotPass extends javax.swing.JFrame {
                             String stmt2 = "username = '" + uname.toLowerCase() + "'";
                             query.updateRow(conn, "UserTable", stmt, stmt2);
                             JOptionPane.showMessageDialog(null, "Password Updated.", "Notice", JOptionPane.INFORMATION_MESSAGE);
+                            
+                            Main m;
+                            try {
+                                this.dispose();
+                                m = new Main();
+                                m.setVisible(true);
+                                m.setLocationRelativeTo(null);
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
                         }else{
                             JOptionPane.showMessageDialog(null, "Retype Password is not the same as New Password.", "Error", JOptionPane.INFORMATION_MESSAGE);
                         }
