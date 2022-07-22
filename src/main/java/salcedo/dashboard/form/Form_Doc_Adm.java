@@ -341,6 +341,7 @@ public class Form_Doc_Adm extends javax.swing.JPanel {
                                     "DocTemplateTable INNER JOIN DocumentTable ON DocTemplateTable.dTemplateID = DocumentTable.dtemplateid",
                                     "DocumentTable.docID = " + rs.getString("docID"));
                             rs2.next();
+                            base.decodeFile(rs2.getBytes("dTemplateBase"), rs2.getString("dTemplatePath"));
                             FileUtils.copyFile(new File(rs2.getString("dTemplatePath")), new File(rs2.getString("docPath")));
                             query.updateRow(conn, "DocumentTable", "docSubmitted = 0", "docID = " + rs.getString("docID"));
                             query.updateRow(conn, "DocumentTable", "docValidated = 0", "docID = " + rs.getString("docID"));

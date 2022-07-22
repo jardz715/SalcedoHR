@@ -280,7 +280,7 @@ public class Form_Time_Adm extends javax.swing.JPanel {
     private void printButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButton1ActionPerformed
         ExcelDTR dtr = new ExcelDTR();
         try {
-            dtr.ExcelDTR(conn, tempID, Integer.toString(dateBox1.getSelectedIndex()+1), dateBox1.getSelectedItem().toString(), yearChooser1.getYear());
+            dtr.ExcelDTR(conn, tempID, Integer.toString(dateBox1.getSelectedIndex()+1), dateBox1.getSelectedItem().toString(), yearChooser1.getYear(), "Adm");
         } catch (IOException | SQLException | ParseException ex) {
             Logger.getLogger(Form_Time_Emp.class.getName()).log(Level.SEVERE, null, ex);
         }

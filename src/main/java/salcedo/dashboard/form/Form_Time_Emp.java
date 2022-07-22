@@ -246,7 +246,7 @@ public class Form_Time_Emp extends javax.swing.JPanel {
     private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
         ExcelDTR dtr = new ExcelDTR();
         try {
-            dtr.ExcelDTR(conn, userid, Integer.toString(dateBox.getSelectedIndex()+1), dateBox.getSelectedItem().toString(), yearChooser.getYear());
+            dtr.ExcelDTR(conn, userid, Integer.toString(dateBox.getSelectedIndex()+1), dateBox.getSelectedItem().toString(), yearChooser.getYear(), "Emp");
         } catch (IOException | SQLException | ParseException ex) {
             Logger.getLogger(Form_Time_Emp.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -20,11 +20,10 @@ public class ExcelDTR {
     
     ResultSet userData, timeData;
     boolean isUsed = true;
-    int total = 0;
     int counter = 1;
     ToBase64 base = new ToBase64();
     
-    public void ExcelDTR(Connection conn, int ID, String Date, String Month, int Year) throws FileNotFoundException, IOException, SQLException, ParseException{
+    public void ExcelDTR(Connection conn, int ID, String Date, String Month, int Year, String type) throws FileNotFoundException, IOException, SQLException, ParseException{
         //take user data and time data
         DBQueries query = new DBQueries();
         if(Date.length() == 1){
@@ -82,17 +81,17 @@ public class ExcelDTR {
             
         }
         
-        //Total undertime
-        row = sheet.getRow(42);
-        cell = row.getCell(5);
-        cell.setCellValue(total + " Minute/s");
-        
         
         //Write and Close
         FileOutputStream outputStream = new FileOutputStream(file);
         workbook.write(outputStream);
         inputStream.close();
         outputStream.close();
+        if(type == "Emp"){
+            file.setWritable(false);
+        }else{
+            file.setWritable(true);
+        }
         Desktop.getDesktop().open(file);
     }
     
@@ -108,23 +107,15 @@ public class ExcelDTR {
                 cell.setCellValue(convertTime(timeData.getString("timeHistIn")));
                 cell = row.getCell(2);
                 cell.setCellValue(convertTime(timeData.getString("timeHistOut")));
-                undertime += timeData.getInt("timeHistUT");
-                total += timeData.getInt("timeHistUT");
                 if(timeData.next() != false){
                     if(timeData.getInt("timeDay") == counter && timeData.getString("timeHistType").equals("Afternoon")){
                         cell = row.getCell(3);
                         cell.setCellValue(convertTime(timeData.getString("timeHistIn")));
                         cell = row.getCell(4);
                         cell.setCellValue(convertTime(timeData.getString("timeHistOut"))); 
-                        undertime += timeData.getInt("timeHistUT");
-                        total += timeData.getInt("timeHistUT");
-                        cell = row.getCell(5);
-                        cell.setCellValue(undertime + " mins");
                         counter++;
                         isUsed = true;
                     }else{
-                        cell = row.getCell(5);
-                        cell.setCellValue(undertime + " mins");
                         counter++;
                         isUsed = false;
                     }
@@ -139,9 +130,6 @@ public class ExcelDTR {
                 cell.setCellValue(convertTime(timeData.getString("timeHistIn")));
                 cell = row.getCell(4);
                 cell.setCellValue(convertTime(timeData.getString("timeHistOut")));
-                cell = row.getCell(5);
-                cell.setCellValue(timeData.getInt("timeHistUT") + " mins" );
-                total += timeData.getInt("timeHistUT");
                 counter++;
                 isUsed = true;
             }

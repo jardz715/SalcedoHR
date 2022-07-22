@@ -243,7 +243,7 @@ public class DBQueries {
         
         //Modified
         public boolean isTimeWithinDay(Connection conn, int id) throws ParseException{
-            ResultSet rs = getRow(conn, "*", "TimeHistoryTable", "DATE(timeHistIn) >= DATE(LOCALTIMESTAMP) AND userID = " + id + " ORDER BY timeHistID DESC");
+            ResultSet rs = getRow(conn, "*", "TimeHistoryTable", "DATE(timeHistIn) >= DATE(DATE_FORMAT(LOCALTIMESTAMP+80000, \"%Y-%m-%d %H:%i:%S\")) AND userID = " + id + " ORDER BY timeHistID DESC");
             try{
                 if(rs.next() != false){
                     if(rs.getString("timeHistType").equals("Morning")){
@@ -265,9 +265,9 @@ public class DBQueries {
             String sql;
             try {
                 if(time.equals("Morning")){
-                    sql = "INSERT INTO TimeTable (userID, timeIn, userIn, userOut, userAftIn, userAftOut, timeType) VALUES(?,LOCALTIMESTAMP,?,?,?,?,'Morning')";
+                    sql = "INSERT INTO TimeTable (userID, timeIn, userIn, userOut, userAftIn, userAftOut, timeType) VALUES(?,DATE_FORMAT(LOCALTIMESTAMP+80000, \"%Y-%m-%d %H:%i:%S\"),?,?,?,?,'Morning')";
                 }else{
-                    sql = "INSERT INTO TimeTable (userID, timeIn, userIn, userOut, userAftIn, userAftOut, timeType) VALUES(?,LOCALTIMESTAMP,?,?,?,?,'Afternoon')";
+                    sql = "INSERT INTO TimeTable (userID, timeIn, userIn, userOut, userAftIn, userAftOut, timeType) VALUES(?,DATE_FORMAT(LOCALTIMESTAMP+80000, \"%Y-%m-%d %H:%i:%S\"),?,?,?,?,'Afternoon')";
                 }
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 for (int i = 0; i < list.size(); i++) {
@@ -309,7 +309,7 @@ public class DBQueries {
       
         //Modified
 	protected void insertTimeOut(Connection conn, int ID) { 
-		String sql = "UPDATE TimeTable SET timeOut = LOCALTIMESTAMP WHERE userID = " + ID;
+		String sql = "UPDATE TimeTable SET timeOut = DATE_FORMAT(LOCALTIMESTAMP+80000, \"%Y-%m-%d %H:%i:%S\") WHERE userID = " + ID;
 		String sql2 = "UPDATE TimeTable SET timeDiff = ?, timeOT = ?, timeUT = ? WHERE userID = " + ID;
 		try {
                     Statement stmt = conn.createStatement();
@@ -327,7 +327,7 @@ public class DBQueries {
         
         //Modified
         protected void forceTimeOut(Connection conn, int ID) { 
-		String sql = "UPDATE TimeTable SET timeOut = LOCALTIMESTAMP WHERE userID = " + ID;
+		String sql = "UPDATE TimeTable SET timeOut = DATE_FORMAT(LOCALTIMESTAMP+80000, \"%Y-%m-%d %H:%i:%S\") WHERE userID = " + ID;
 		String sql2 = "UPDATE TimeTable SET timeDiff = ?, timeOT = ?, timeUT = ? WHERE userID = " + ID;
 		try {
                     Statement stmt = conn.createStatement();

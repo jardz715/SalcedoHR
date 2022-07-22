@@ -233,6 +233,8 @@ public class Form_Doc_Emp extends javax.swing.JPanel {
                 "DocTemplateTable INNER JOIN DocumentTable ON DocTemplateTable.dTemplateID = DocumentTable.dtemplateid",
                 "DocumentTable.docID = " + rs.getString("docID"));
         rs2.next();
+        ToBase64 base = new ToBase64();
+        base.decodeFile(rs2.getBytes("dTemplateBase"), rs2.getString("dTemplatePath"));
         String newBase64 = rs2.getString("dTemplateBase");
         query.updateRow(conn, "DocumentTable", "docBase = '" + newBase64 +"'", "docID = " + rs.getString("docID"));
         File file = new File(rs2.getString("docPath"));
